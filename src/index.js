@@ -12,6 +12,10 @@ app.use("/receive/slack_event", slackEvents.requestListener());
 
 app.use(express.json());
 
+slackEvents.on("error", error => {
+  console.error(error);
+});
+
 app.listen(port, () => {
   console.log(`Listening for events on ${port}`);
 });
