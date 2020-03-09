@@ -1,15 +1,14 @@
 const express = require("express");
 const { createEventAdapter } = require("@slack/events-api");
+const { SLACK_SIGNING_SECRET } = require("./const");
 
-const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
 const port = process.env.PORT || 3000;
 
-const slackEvents = createEventAdapter(slackSigningSecret);
+const slackEvents = createEventAdapter(SLACK_SIGNING_SECRET);
 
 const app = express();
 
 app.use("/receive/slack_event", slackEvents.requestListener());
-
 app.use(express.json());
 
 slackEvents.on("error", error => {
