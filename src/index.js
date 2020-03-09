@@ -13,11 +13,6 @@ app.use(express.json());
 
 slackEvents.on("reaction_added", event => console.log(event));
 slackEvents.on("reaction_removed", event => console.log(event));
+slackEvents.on("error", error => console.error(error));
 
-slackEvents.on("error", error => {
-  console.error(error);
-});
-
-app.listen(port, () => {
-  console.log(`Listening for events on ${port}`);
-});
+app.listen(port, () => console.log(`Listening for events on ${port}`));
