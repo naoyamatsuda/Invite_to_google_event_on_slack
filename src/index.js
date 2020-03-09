@@ -11,6 +11,9 @@ const app = express();
 app.use("/receive/slack_event", slackEvents.requestListener());
 app.use(express.json());
 
+slackEvents.on("reaction_added", event => console.log(event));
+slackEvents.on("reaction_removed", event => console.log(event));
+
 slackEvents.on("error", error => {
   console.error(error);
 });
