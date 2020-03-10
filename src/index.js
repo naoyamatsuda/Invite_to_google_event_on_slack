@@ -15,15 +15,29 @@ app.use("/receive/slack_event", slackEvents.requestListener());
 app.use(express.json());
 
 slackEvents.on("reaction_added", async event => {
-  web.conversations
+  const { messages } = await web.conversations
     .history({
       channel: event.item.channel,
       latest: event.item.ts,
       limit: 1,
       inclusive: true
     })
+    .then(res => res)
+    .catch(err => {
+      console.error(err);
+      throw err;
+    });
+
+  console.log(messages);
+  web.users
+    .info({
+      user: messages[0].user
+    })
     .then(res => console.log(res))
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.error(err);
+      throw err;
+    });
 });
 slackEvents.on("reaction_removed", event => console.log(event));
 slackEvents.on("error", error => console.error(error));
