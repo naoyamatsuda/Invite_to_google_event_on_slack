@@ -72,6 +72,9 @@ web_modules/
 .env
 .env.test
 
+# google api token file
+*token.json
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 
