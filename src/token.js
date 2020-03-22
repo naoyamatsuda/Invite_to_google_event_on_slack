@@ -14,5 +14,5 @@ module.exports.readToken = async () => {
 
 module.exports.writeToken = async (oldToken, json) => {
   const registerToken = { ...oldToken, ...json };
-  writeJsonFile("../token.json", registerToken);
+  writeJsonFile("token.json", registerToken);
 };
