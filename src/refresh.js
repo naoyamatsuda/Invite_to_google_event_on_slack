@@ -1,6 +1,7 @@
 const axios = require("axios");
 const qs = require("querystring");
 const { readJsonFile } = require("./jsonFile");
+const { writeToken } = require("./token");
 
 const createRefreshRequest = (token, creadential) => {
   return {
@@ -73,6 +74,8 @@ const app = async callbackApi => {
       console.log(err);
       throw err;
     });
+
+  writeToken({ ...token }, { access_token: accessToken });
 };
 
 module.exports = app();
