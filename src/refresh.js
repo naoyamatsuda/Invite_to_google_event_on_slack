@@ -24,43 +24,48 @@ const createRefreshRequest = (token, creadential) => {
   };
 };
 
-const app = async callbackApi => {
-  const token = {
-    refreshToken:
-      "1%2F%2F0e7TtZhteKOj_CgYIARAAGA4SNwF-L9IrE9726lbiAuU3oCJwzjc0P-5OOBzI6QeReIszUBd6JnEQ7v_vcShgUkVX_pWfmrJ_6x4"
-  };
-  const credential = await readJsonFile("oauthCredential.json").then(
-    credentialJson => {
-      if (!credentialJson.installed) {
-        throw new Error("not found credentialJson info");
-      }
-      const {
-        client_id: clientId,
-        project_id: projectId,
-        auth_uri: authUri,
-        token_uri: tokenUri,
-        client_secret: clientSecret,
-        redirect_uris: redirectUri
-      } = credentialJson.installed;
-      if (
-        !clientId ||
-        !projectId ||
-        !authUri ||
-        !tokenUri ||
-        !clientSecret ||
-        !redirectUri
-      )
-        throw new Error("not found creadetial info");
-      return {
-        clientId,
-        projectId,
-        authUri,
-        tokenUri,
-        clientSecret,
-        redirectUri
-      };
+const validCredentialJson = credentialJson => {
+  return new Promise((resolve, reject) => {
+    if (!credentialJson.installed) {
+      return reject(new Error("not found credentialJson info"));
     }
-  );
+    const {
+      client_id: clientId,
+      project_id: projectId,
+      auth_uri: authUri,
+      token_uri: tokenUri,
+      client_secret: clientSecret,
+      redirect_uris: redirectUri
+    } = credentialJson.installed;
+
+    if (
+      !clientId ||
+      !projectId ||
+      !authUri ||
+      !tokenUri ||
+      !clientSecret ||
+      !redirectUri
+    )
+      return reject(new Error("not found creadetial info"));
+
+    return resolve({
+      clientId,
+      projectId,
+      authUri,
+      tokenUri,
+      clientSecret,
+      redirectUri
+    });
+  });
+};
+
+const refreshToken = async (token, callback) => {
+  const credential = await readJsonFile("oauthCredential.json")
+    .then(validCredentialJson)
+    .catch(e => {
+      throw e;
+    });
+
   const axiosconfig = createRefreshRequest(token, credential);
   const { access_token: accessToken } = await axios(axiosconfig)
     .then(response => {
@@ -76,6 +81,8 @@ const app = async callbackApi => {
     });
 
   writeToken({ ...token }, { access_token: accessToken });
+
+  return callback(accessToken);
 };
 
-module.exports = app();
+module.exports = refreshToken;
