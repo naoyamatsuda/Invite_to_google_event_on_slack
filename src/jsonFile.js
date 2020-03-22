@@ -36,12 +36,12 @@ module.exports.writeJsonFile = async (path, json) => {
   try {
     jsonString = JSON.stringify(json);
   } catch (e) {
-    console.log(e);
-    throw new Error("json sgtinfy error");
+    console.log("json sgtinfy error");
+    throw e;
   }
   const result = await fsPromises.writeFile(path, jsonString).catch(err => {
-    console.log(err);
-    throw new Error(err);
+    console.log("Access token write failure");
+    throw err;
   });
   return result;
 };
