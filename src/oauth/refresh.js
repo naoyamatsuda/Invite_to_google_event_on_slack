@@ -1,6 +1,6 @@
 const axios = require("axios");
 const qs = require("querystring");
-const { readJsonFile } = require("./jsonFile");
+const { readJsonFile } = require("../jsonFile");
 const { writeToken } = require("./token");
 
 const createRefreshRequest = (token, creadential) => {

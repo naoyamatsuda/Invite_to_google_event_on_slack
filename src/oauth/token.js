@@ -1,7 +1,7 @@
-const { readJsonFile, writeJsonFile } = require("./jsonFile");
+const { readJsonFile, writeJsonFile } = require("../jsonFile");
 
 module.exports.readToken = async () => {
-  const result = await readJsonFile("../token.json").then(token => {
+  const result = await readJsonFile("../../token.json").then(token => {
     if (!token.access_token || !token.refresh_token)
       throw new Error("not found token");
     return token;
