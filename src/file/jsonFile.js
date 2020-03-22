@@ -1,5 +1,4 @@
 const fsPromises = require("fs").promises;
-require("../oauthCredential");
 
 const jsonparseAsync = json => {
   return new Promise((resolve, reject) => {

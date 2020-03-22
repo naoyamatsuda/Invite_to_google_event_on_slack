@@ -1,4 +1,4 @@
-const { readJsonFile, writeJsonFile } = require("../jsonFile");
+const { readJsonFile, writeJsonFile } = require("../file/jsonFile");
 
 module.exports.readToken = async () => {
   const result = await readJsonFile("../../token.json").then(token => {
