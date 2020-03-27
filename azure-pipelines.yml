@@ -29,7 +29,26 @@ steps:
         echo "$tokenJson" > token.json
       workingDirectory: '$(System.DefaultWorkingDirectory)'
 
-    
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        credential=$(cat << EOS
+        {
+          "installed": {
+            "client_id": "250679229437-pj5uie7mo2vb9d3pvhilsa03d63oprad.apps.googleusercontent.com",
+            "project_id": "quickstart-1550231045469",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_secret": "$CLIENTSECRET",
+            "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
+          }
+        }
+        EOS
+        )
+        echo "$credential" > oauthCredential.json
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
 
   - task: ArchiveFiles@2
     inputs:
