@@ -35,7 +35,7 @@ slackEvents.on("reaction_added", async event => {
     user: {
       profile: { email }
     }
-  } = web.users
+  } = await web.users
     .info({ user })
     .then(res => res)
     .catch(err => {
