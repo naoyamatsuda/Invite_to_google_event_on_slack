@@ -59,11 +59,8 @@ const googleAPiRequester = reqConfig => async (token = {}) => {
   return response;
 };
 
-// module.exports.inviteCalendar = async message => {
-const app = async () => {
-  const date = "2020/03/28";
-  // const date = message.match(dateReg);
-
+module.exports.inviteCalendar = async (message, email) => {
+  const date = message.match(dateReg);
   if (!date) throw Error(`Not Found date in ${dateReg} format`);
 
   const momentDate = moment(date, "YYYY/MM/DD").clone();
@@ -96,7 +93,7 @@ const app = async () => {
   if (!event.attendees || !event.attendees.length) {
     updateAttendees = [{ email: "matsuda.istech@gmail.com" }];
   } else {
-    updateAttendees = [...event.attendees, { email: "" }];
+    updateAttendees = [...event.attendees, { email }];
   }
 
   const inviteReqConf = createPatchGuest(
@@ -110,5 +107,3 @@ const app = async () => {
 
   return updateResult;
 };
-
-module.exports = app();

@@ -2,6 +2,7 @@ const express = require("express");
 const { createEventAdapter } = require("@slack/events-api");
 const { WebClient } = require("@slack/web-api");
 const { SLACK_SIGNING_SECRET, SLACK_TOKEN } = require("./const");
+const { inviteCalendar } = require("./calendar");
 
 const port = process.env.PORT || 3000;
 
@@ -28,15 +29,21 @@ slackEvents.on("reaction_added", async event => {
       throw err;
     });
 
-  web.users
-    .info({
-      user: messages[0].user
-    })
-    .then(res => console.log(res))
+  const { text, user } = messages[0];
+
+  const {
+    user: {
+      profile: { email }
+    }
+  } = web.users
+    .info({ user })
+    .then(res => res)
     .catch(err => {
       console.error(err);
       throw err;
     });
+
+  inviteCalendar(text, email);
 });
 slackEvents.on("reaction_removed", event => console.log(event));
 slackEvents.on("error", error => console.error(error));
