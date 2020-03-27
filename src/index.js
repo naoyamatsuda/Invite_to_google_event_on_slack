@@ -28,7 +28,6 @@ slackEvents.on("reaction_added", async event => {
       throw err;
     });
 
-  console.log(messages);
   web.users
     .info({
       user: messages[0].user
