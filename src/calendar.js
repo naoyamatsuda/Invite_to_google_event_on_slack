@@ -9,12 +9,7 @@ const { refreshToken } = require("./oauth/refresh");
 
 const dateReg = /(\d{4}\/\d{2}\/\d{2})/g;
 
-const createGoogleReqeustBase = async (
-  method,
-  endpoint,
-  queryParam = {},
-  token
-) => {
+const createGoogleReqeustBase = (method, endpoint, queryParam = {}, token) => {
   const convertedQueryParam = Object.keys(queryParam).length
     ? `?${qs.stringify(queryParam)}`
     : "";
@@ -28,7 +23,19 @@ const createGoogleReqeustBase = async (
   };
 };
 
-const fetchEvent = reqConfig => async (token = {}) => {
+const createPatchGuest = (method, endpoint, data, token) => {
+  return {
+    method,
+    url: `${GOOGLE_API_BASE_URL}${endpoint}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    data
+  };
+};
+
+const googleAPiRequester = reqConfig => async (token = {}) => {
   const mergedToken = {
     ...reqConfig.headers,
     headers: { Authorization: `Bearer ${token.access_token}` }
@@ -45,7 +52,7 @@ const fetchEvent = reqConfig => async (token = {}) => {
       if (e.response.status !== 401) throw new Error(e.response.data);
       const callbackResult = await refreshToken(
         token,
-        fetchEvent(mergedReqConf)
+        googleAPiRequester(mergedReqConf)
       );
       return callbackResult;
     });
@@ -54,7 +61,7 @@ const fetchEvent = reqConfig => async (token = {}) => {
 
 // module.exports.inviteCalendar = async message => {
 const app = async () => {
-  const date = "2020/05/20";
+  const date = "2020/03/28";
   // const date = message.match(dateReg);
 
   if (!date) throw Error(`Not Found date in ${dateReg} format`);
@@ -67,7 +74,7 @@ const app = async () => {
     .format();
 
   const token = await readToken().catch(e => console.log(e));
-  const reqConfig = await createGoogleReqeustBase(
+  const reqConfig = createGoogleReqeustBase(
     "GET",
     `/calendars/primary/events`,
     {
@@ -78,12 +85,30 @@ const app = async () => {
     token.access_token
   );
 
-  const response = await fetchEvent(reqConfig)(token);
+  const { items } = await googleAPiRequester(reqConfig)(token);
 
-  if (!response.items.length) throw new Error("not found event");
-  if (response.items.length > 1) throw new Error("Multiple event found");
+  if (!items.length) throw new Error("not found event");
+  if (items.length > 1) throw new Error("Multiple event found");
 
-  return;
+  const event = items[0];
+
+  let updateAttendees;
+  if (!event.attendees || !event.attendees.length) {
+    updateAttendees = [{ email: "matsuda.istech@gmail.com" }];
+  } else {
+    updateAttendees = [...event.attendees, { email: "" }];
+  }
+
+  const inviteReqConf = createPatchGuest(
+    "PATCH",
+    `/calendars/primary/events/${event.id}`,
+    { attendees: updateAttendees },
+    token.access_token
+  );
+
+  const updateResult = await googleAPiRequester(inviteReqConf)(token);
+
+  return updateResult;
 };
 
 module.exports = app();
