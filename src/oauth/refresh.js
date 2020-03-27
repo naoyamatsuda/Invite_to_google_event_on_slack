@@ -15,7 +15,7 @@ const createRefreshRequest = (token, creadential) => {
         grant_type: "refresh_token",
         client_id: creadential.clientId,
         client_secret: creadential.clientSecret,
-        refresh_token: token.refreshToken
+        refresh_token: token.refresh_token
       },
       null,
       null,
@@ -59,7 +59,7 @@ const validCredentialJson = credentialJson => {
   });
 };
 
-const refreshToken = async (token, callback) => {
+module.exports.refreshToken = async (token, callback) => {
   const credential = await readJsonFile("oauthCredential.json")
     .then(validCredentialJson)
     .catch(e => {
@@ -67,7 +67,7 @@ const refreshToken = async (token, callback) => {
     });
 
   const axiosconfig = createRefreshRequest(token, credential);
-  const { access_token: accessToken } = await axios(axiosconfig)
+  const refreshedToken = await axios(axiosconfig)
     .then(response => {
       if (!response || !response.data) {
         throw new Error("not found refresh token response data");
@@ -80,9 +80,7 @@ const refreshToken = async (token, callback) => {
       throw err;
     });
 
-  writeToken({ ...token }, { access_token: accessToken });
+  await writeToken({ ...token }, { access_token: refreshedToken.access_token });
 
-  return callback(accessToken);
+  return callback(refreshedToken);
 };
-
-module.exports = refreshToken;
