@@ -14,6 +14,23 @@ steps:
       npm install
     displayName: "npm install"
 
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        tokenJson=$(cat << EOS
+        {
+          "access_token": "ya29.a0Adw1xeW67nCJdysnFJdTjVWayoYQtOQe8FIeWadg-7mtYCqqg96y1MJHLg5RKurxhlsWYWfKjZC4pYNEJMhXxd2XMjIjgovUX4vHRFvFYUlppFCinFKBQBWOJy4mMu7P6hA4mXOCmK5MWPQECBpUrJh-vXzd5KkZRdw",
+          "refresh_token": "1//0e24LN9CebKUfCgYIARAAGA4SNwF-L9IrsfwR8CPDf-CiQ23hbOzPPmd7W3SILksWgTEMQrfsUOKIeah0lQMaiX2k-DjyoKYm0-M"
+        }
+        EOS
+        )
+        
+        echo "$tokenJson" > token.json
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+    
+
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: "$(System.DefaultWorkingDirectory)"
