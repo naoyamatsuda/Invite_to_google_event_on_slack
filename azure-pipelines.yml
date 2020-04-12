@@ -92,3 +92,9 @@ stages:
               appType: webAppLinux
               appName: $(appName)
               package: $(Pipeline.Workspace)/deployPackage/*.zip
+              runtimeStack: "NODE|12-lts"
+              appSettings: -REACTION "star-struck" -SLACK_SIGNING_SECRET $(SLACK_SIGNING_SECRET) -SLACK_TOKEN $(SLACK_TOKEN)
+              startUpCommand: "npm start"
+            env:
+              SLACK_SIGNING_SECRET: $(SLACK_SIGNING_SECRET)
+              SLACK_TOKEN: $(SLACK_TOKEN)

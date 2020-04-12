@@ -1,7 +1,7 @@
 const express = require("express");
 const { createEventAdapter } = require("@slack/events-api");
 const { WebClient } = require("@slack/web-api");
-const { SLACK_SIGNING_SECRET, SLACK_TOKEN } = require("./const");
+const { SLACK_SIGNING_SECRET, SLACK_TOKEN, REACTION } = require("./const");
 const { inviteCalendar } = require("./calendar");
 
 const port = process.env.PORT || 3000;
@@ -16,6 +16,9 @@ app.use("/receive/slack_event", slackEvents.requestListener());
 app.use(express.json());
 
 slackEvents.on("reaction_added", async event => {
+  if (!event || event.reaction !== REACTION) {
+    throw new Error("Not the target reaction");
+  }
   const { messages } = await web.conversations
     .history({
       channel: event.item.channel,
