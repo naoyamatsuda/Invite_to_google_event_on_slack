@@ -20,13 +20,16 @@ steps:
       script: |
         tokenJson=$(cat << EOS
         {
-          "access_token": "ya29.a0Adw1xeW67nCJdysnFJdTjVWayoYQtOQe8FIeWadg-7mtYCqqg96y1MJHLg5RKurxhlsWYWfKjZC4pYNEJMhXxd2XMjIjgovUX4vHRFvFYUlppFCinFKBQBWOJy4mMu7P6hA4mXOCmK5MWPQECBpUrJh-vXzd5KkZRdw",
-          "refresh_token": "1//0e24LN9CebKUfCgYIARAAGA4SNwF-L9IrsfwR8CPDf-CiQ23hbOzPPmd7W3SILksWgTEMQrfsUOKIeah0lQMaiX2k-DjyoKYm0-M"
+          "access_token": $ACCESS_TOKEN,
+          "refresh_token": $REFRESH_TOKEN
         }
         EOS
         )
         echo "$tokenJson" > token.json
       workingDirectory: "$(System.DefaultWorkingDirectory)"
+    env:
+      ACCESS_TOKEN: $(ACCESS_TOKEN)
+      REFRESH_TOKEN: $(REFRESH_TOKEN)
 
   - task: Bash@3
     inputs:
@@ -35,12 +38,12 @@ steps:
         credential=$(cat << EOS
         {
           "installed": {
-            "client_id": "250679229437-pj5uie7mo2vb9d3pvhilsa03d63oprad.apps.googleusercontent.com",
+            "client_id": $CLIENT_ID,
             "project_id": "quickstart-1550231045469",
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-            "client_secret": "$(client_secret)",
+            "client_secret": "$CLIENT_SECRET",
             "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
           }
         }
@@ -48,6 +51,9 @@ steps:
         )
         echo "$credential" > oauthCredential.json
       workingDirectory: "$(System.DefaultWorkingDirectory)"
+    env:
+      CLIENT_ID: $(CLIENT_ID)
+      CLIENT_SECRET: $(CLIENT_SECRET)
 
   - task: ArchiveFiles@2
     inputs:
