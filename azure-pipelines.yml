@@ -5,9 +5,11 @@ pool:
   vmImage: "ubuntu-latest"
 
 stages:
-  - stage: 
+  - stage: testAndBuild
     jobs: 
       - job: testAndBuild
+        pool:
+          vmImage: ubuntu-16.04
         steps:
           - task: NodeTool@0
             inputs:
@@ -32,8 +34,8 @@ stages:
                 echo "$tokenJson" > token.json
               workingDirectory: "$(System.DefaultWorkingDirectory)"
             env:
-              ACCESS_TOKEN: $(ACCESS_TOKEN)
-              REFRESH_TOKEN: $(REFRESH_TOKEN)
+              ACCESS_TOKEN: $(accessToken)
+              REFRESH_TOKEN: $(refreshToken)
 
           - task: Bash@3
             inputs:
@@ -56,8 +58,8 @@ stages:
                 echo "$credential" > oauthCredential.json
               workingDirectory: "$(System.DefaultWorkingDirectory)"
             env:
-              CLIENT_ID: $(CLIENT_ID)
-              CLIENT_SECRET: $(CLIENT_SECRET)
+              CLIENT_ID: $(clientID)
+              CLIENT_SECRET: $(clientSecret)
 
           - task: ArchiveFiles@2
             inputs:
@@ -67,8 +69,21 @@ stages:
               archiveFile: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip"
               replaceExistingArchive: true
 
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip"
-              ArtifactName: "drop"
-              publishLocation: "Container"
+          - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+            artifact: deployPackage
+
+  - stage: WebAppsDeploy
+
+    dependsOn: testAndBuild
+    jobs:
+      - job: WebAppsDeploy
+        pool:
+          vmImage: ubuntu-16.04
+        steps:
+          - task: AzureWebApp@1
+            displayName: Azure Web Apps Deploy
+            inputs: 
+              azureSubscription: $(azureSubscription)
+              appType: webAppLinux
+              appName: $(appName)
+              package: $(Build.ArtifactStagingDirectory)/**/*.zip
