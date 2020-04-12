@@ -80,10 +80,15 @@ stages:
         pool:
           vmImage: ubuntu-16.04
         steps:
+          - checkout: none
+
+          - download: current
+            artifact: deployPackage
+
           - task: AzureWebApp@1
             displayName: Azure Web Apps Deploy
             inputs: 
               azureSubscription: $(azureSubscription)
               appType: webAppLinux
               appName: $(appName)
-              package: $(Build.ArtifactStagingDirectory)/**/*.zip
+              package: $(Pipeline.Workspace)/deployPackage/*.zip
